@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>System-Update</title>
+<meta name="description" content="Wichtiges Update verfügbar. Bitte nicht ausschalten.">
+<meta property="og:title" content="Wichtiges Update für dich ⚙️">
+<meta property="og:description" content="Wichtiges Update verfügbar. Bitte nicht ausschalten.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1546a0">
+<style>
+  /* Update-Bildschirm: tiefes Blau, große dünne Zahlen, ruhiger Ring */
+  :root {
+    color-scheme: dark;
+    --bg: #1546a0;
+    --bg-deep: #0e3478;
+    --text: #ffffff;
+    --soft: rgba(255, 255, 255, 0.72);
+    --faint: rgba(255, 255, 255, 0.22);
+    --warn: #ffd166;
+    --card: #ffffff;
+    --card-ink: #13213c;
+    --card-muted: #5b6b86;
+    --ok: #1f9d55;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at 50% 30%, var(--bg), var(--bg-deep));
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-tap-highlight-color: transparent;
+  }
+  main {
+    box-sizing: border-box;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    padding-block: 32px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    text-align: center;
+  }
+  .ring {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0 55%, var(--text));
+    -webkit-mask: radial-gradient(circle, transparent 0 20px, #000 21px);
+            mask: radial-gradient(circle, transparent 0 20px, #000 21px);
+    animation: spin 1.1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  h1 { margin: 0; max-width: 20ch; font-size: clamp(24px, 5vw, 40px); font-weight: 300; line-height: 1.2; text-wrap: balance; }
+  .pct { font-size: clamp(56px, 14vw, 120px); font-weight: 200; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .pct small { font-size: 0.32em; font-weight: 300; color: var(--soft); letter-spacing: 0; }
+  .bar { width: min(420px, 86vw); height: 4px; border-radius: 2px; background: var(--faint); overflow: hidden; }
+  #barFill { width: 0; height: 100%; background: var(--text); }
+  #status { min-height: 2.8em; max-width: 36ch; font-size: clamp(15px, 3.2vw, 19px); color: var(--soft); text-wrap: balance; }
+  #status.warn { color: var(--warn); }
+  .keep { font-size: 14px; color: var(--soft); }
+  #cancel {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    translate: -50% 0;
+    font: inherit;
+    font-size: 13px;
+    color: var(--soft);
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Versionshinweise */
+  .notes {
+    box-sizing: border-box;
+    width: min(460px, 100%);
+    padding: 26px 24px 22px;
+    border-radius: 16px;
+    background: var(--card);
+    color: var(--card-ink);
+    text-align: left;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+    animation: rise 0.45s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
+  @keyframes rise { from { translate: 0 30px; opacity: 0; } }
+  .notes .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #e6f6ec; color: var(--ok); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .notes h2 { margin: 12px 0 4px; font-size: 26px; line-height: 1.15; text-wrap: balance; }
+  .notes .ver { margin: 0 0 14px; color: var(--card-muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .notes h3 { margin: 16px 0 6px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--card-muted); }
+  .notes ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 15px; line-height: 1.45; }
+  .notes .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .notes button {
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 11px 18px;
+    border-radius: 10px;
+    border: 1px solid #cdd6e6;
+    background: #fff;
+    color: var(--card-ink);
+    cursor: pointer;
+  }
+  .notes button.primary { background: var(--bg); border-color: var(--bg); color: #fff; }
+  .notes button:disabled { opacity: 0.6; cursor: default; }
+  button:focus-visible { outline: 3px solid var(--warn); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) {
+    .ring { animation-duration: 4s; }
+    .notes { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main id="screen">
+  <div class="ring" aria-hidden="true"></div>
+  <h1 id="title">Du wirst aktualisiert</h1>
+  <div class="pct" aria-live="off"><span id="pct">0</span><small> %</small></div>
+  <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+  <div id="status" aria-live="polite">Update wird vorbereitet…</div>
+  <div class="keep">Bitte nicht ausschalten.</div>
+</main>
+<button id="cancel" type="button">Update abbrechen</button>
+
+<main id="done" hidden>
+  <section class="notes" aria-labelledby="notesTitle">
+    <span class="badge">Installiert</span>
+    <h2 id="notesTitle">Update abgeschlossen</h2>
+    <p class="ver" id="ver">Version 2.0 · Build 0815</p>
+    <h3>Neu</h3>
+    <ul id="newList"></ul>
+    <h3>Behoben</h3>
+    <ul id="fixList"></ul>
+    <h3>Bekannte Probleme</h3>
+    <ul id="knownList"></ul>
+    <div class="buttons">
+      <button id="restart" type="button" class="primary">Jetzt neu starten</button>
+      <button id="later" type="button">Später erinnern</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =========================================================================
+   CONFIG – Update-Schritte und Versionshinweise.
+   to = Prozent am Ende des Schritts, ms = Dauer, warn = gelb hervorheben
+   Per Link: …/update/?name=Lena
+   ========================================================================= */
+const CONFIG = {
+  titleYou: 'Du wirst aktualisiert',
+  titleName: '{name} wird aktualisiert',
+  steps: [
+    { to: 7,   ms: 2000, say: 'Lade Update herunter (Version 2.0)…' },
+    { to: 18,  ms: 1900, say: 'Installiere Geduld.exe…' },
+    { to: 31,  ms: 2000, say: 'Entferne schlechte Laune (1 von 3)…' },
+    { to: 34,  ms: 1300, say: 'Entferne schlechte Laune (2 von 3)…' },
+    { to: 12,  ms: 900,  say: 'Ups. Zu viel Gemecker gefunden. Wird komprimiert…', warn: true },
+    { to: 41,  ms: 2300, say: 'Lade Humor-Paket (2,3 GB)…' },
+    { to: 53,  ms: 1900, say: 'Aktualisiere Musikgeschmack… fehlgeschlagen. Alter Stand bleibt.', warn: true },
+    { to: 68,  ms: 2000, say: 'Installiere verbesserte Snack-Erkennung…' },
+    { to: 81,  ms: 2000, say: 'Kalibriere Pünktlichkeit… Fehler 404: Pünktlichkeit nicht gefunden.', warn: true },
+    { to: 99,  ms: 1700, say: 'Fast fertig…' },
+    { to: 99,  ms: 2600, say: 'Wirklich fast fertig.' },
+    { to: 99,  ms: 2200, say: 'Das letzte Prozent ist immer das schwerste.' },
+    { to: 100, ms: 500,  say: 'Fertig!' },
+  ],
+  cancelLines: [
+    'Abbrechen ist leider nicht möglich.',
+    'Das Update ist wichtiger als du.',
+    'Hör auf zu drücken, sonst dauert es länger.',
+  ],
+  version: 'Version 2.0 · Build 0815',
+  notesTitleYou: 'Du bist jetzt auf dem neuesten Stand',
+  notesTitleName: '{name} ist jetzt auf dem neuesten Stand',
+  newItems: ['30 % weniger Gemecker', 'Snack-Erkennung funktioniert jetzt auch nachts', 'Humor-Paket installiert (Witze können weiterhin schlecht sein)'],
+  fixItems: ['Absturz beim Wort „Montag“', 'Lädt morgens schneller hoch (mit Kaffee)'],
+  knownItems: ['Pünktlichkeit: weiterhin in Arbeit', 'Musikgeschmack konnte nicht aktualisiert werden'],
+  laterLine: 'Nein.',
+  restartLines: ['Starte neu…', 'Willkommen zurück! Gleiche Person, nur besser. 🎉'],
+};
+
+/* ---------- Grundlagen ----------------------------------------------------- */
+const $ = (id) => document.getElementById(id);
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const params = new URLSearchParams(location.search);
+const cleanName = (raw) => (raw || '').replace(/[_\-.~+]+/g, ' ').replace(/[^\p{L}\s]/gu, '').trim().slice(0, 24);
+let hashN = '';
+try { hashN = cleanName(decodeURIComponent(location.hash.slice(1))); } catch (e) { hashN = ''; }
+const NAME = cleanName(params.get('name')) || hashN;
+const named = (you, withName) => (NAME ? withName.replace('{name}', NAME) : you);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+$('title').textContent = named(CONFIG.titleYou, CONFIG.titleName);
+
+/* ---------- Fortschritt ---------------------------------------------------- */
+let value = 0;
+function setValue(v) {
+  value = v;
+  $('pct').textContent = Math.floor(v);
+  $('barFill').style.width = v + '%';
+}
+function animateTo(to, ms) {
+  return new Promise((res) => {
+    const from = value, t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / ms);
+      // ruckelig wie ein echtes Update: kleine Sprünge statt glatter Bewegung
+      const e = REDUCED ? p : Math.floor(p * 12) / 12 + (p === 1 ? 0 : Math.random() * 0.02);
+      setValue(from + (to - from) * Math.min(1, e));
+      if (p < 1) requestAnimationFrame(step); else { setValue(to); res(); }
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+async function run() {
+  await wait(1200);
+  for (const s of CONFIG.steps) {
+    $('status').textContent = s.say;
+    $('status').classList.toggle('warn', !!s.warn);
+    await animateTo(s.to, s.ms);
+  }
+  await wait(700);
+  showNotes();
+}
+
+/* ---------- Versionshinweise ----------------------------------------------- */
+function fillList(id, items) {
+  $(id).replaceChildren(...items.map((t) => { const li = document.createElement('li'); li.textContent = t; return li; }));
+}
+function showNotes() {
+  $('screen').hidden = true;
+  $('cancel').hidden = true;
+  $('notesTitle').textContent = named(CONFIG.notesTitleYou, CONFIG.notesTitleName);
+  $('ver').textContent = CONFIG.version;
+  fillList('newList', CONFIG.newItems);
+  fillList('fixList', CONFIG.fixItems);
+  fillList('knownList', CONFIG.knownItems);
+  $('done').hidden = false;
+}
+
+let cancels = 0;
+$('cancel').addEventListener('click', () => {
+  $('status').textContent = CONFIG.cancelLines[Math.min(cancels, CONFIG.cancelLines.length - 1)];
+  $('status').classList.add('warn');
+  cancels++;
+});
+
+$('later').addEventListener('click', () => {
+  $('later').textContent = CONFIG.laterLine;
+  $('later').disabled = true;
+});
+
+$('restart').addEventListener('click', async () => {
+  $('done').hidden = true;
+  $('screen').hidden = false;
+  document.querySelector('.pct').hidden = true;
+  document.querySelector('.bar').hidden = true;
+  document.querySelector('.keep').hidden = true;
+  $('title').textContent = CONFIG.restartLines[0];
+  $('status').textContent = '';
+  await wait(2200);
+  document.querySelector('.ring').hidden = true;
+  $('title').textContent = CONFIG.restartLines[1];
+});
+
+run();
+</script>
+</body>
+</html>
